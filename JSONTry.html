@@ -1,0 +1,147 @@
+<!DOCTYPE>
+<head>
+<style>
+path { 
+    stroke: #FF9900;
+    stroke-width: 2;
+    fill: none;
+    padding-left: 20px;
+    }
+
+   .axis path,
+   .axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+    }
+    
+    .area {
+    fill: lightsteelblue;
+    stroke-width: 0;
+    }
+       
+    .xAxis{
+    font-size: 12px;
+    font-family: Arial;
+    }
+	</style>
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var margin = {top: 50, right: 200, bottom: 60, left: 50},
+    width = 900 - margin.left - margin.right,
+    height = 350 - margin.top - margin.bottom;
+    
+    
+    
+    // Parse the  time
+    var parseTime = d3.time.format("%H:%M").parse;
+    var formatTime = d3.time.format("%H:%M");
+    var ratio = d3.format("04d");
+    
+    //range
+    var x = d3.time.scale().range([3, width]);
+             
+    var y = d3.scale.linear().range([height, 0]);
+    
+    
+    //axses
+    var xAxis = d3.svg.axis()
+               .scale(x)
+               .ticks(12)
+               .orient("bottom")
+               .ticks(d3.time.hour, 2)
+               .tickFormat(d3.time.format("%H"));
+ 
+    var yAxis = d3.svg.axis()
+              .scale(y)
+               .orient("left")
+               .ticks(12);
+               
+    //valuelines
+    var valueline = d3.svg.line()
+                    .interpolate("linear")
+                    .x (function(d) {return x(d.outTimestamp); })
+                    .y (function(d) {return y(d.compressionRatioInPercent); });
+                    
+    //svg canvas
+    var svg1 = d3.select("body")
+              .append("svg")
+                 .attr("width",  width + margin.left + margin.right)
+                 .attr("height", height + margin.bottom + margin.left);
+               //.append("g")
+               //   .attr("transform",
+               //         "translate(" + margin.left + "," + margin.top + ")")
+               //         .call(tip);
+                  
+     //data upload
+     //d3.json("file.json", function(error, data) {
+
+    var data = [
+    {
+        "outTimestamp": 1415635862, 
+        "compressionRatioInPercent": 13.974863249659291, 
+            }, 
+    {
+        "outTimestamp": 1415635965, 
+        "compressionRatioInPercent": 14.771445012891368, 
+            }, 
+    {
+        "outTimestamp": 1415636146, 
+        "compressionRatioInPercent": 15.475327655845122, 
+            }, 
+    {
+        "outTimestamp": 1415636244, 
+        "compressionRatioInPercent": 14.30788993821171, 
+            }];
+           data.forEach(function(d) 
+           {
+           d.outTimestamp = new Date(d.outTimestamp*1000);
+           d.compressionRatioInPercent = +d.compressionRatioInPercent;
+           });
+               
+      // Scale the range of the data
+      x.domain(d3.extent(data, function(d) { return d.outTimestamp; }));
+      y.domain([0, d3.max(data, function(d) { return d.compressionRatioInPercent; })]);
+      
+     
+       // Add the valueline path.
+      svg1.append("path")
+      .attr("class", "line")
+      .attr("d", valueline(data))
+      .style("stroke-width", 2)         // adjust line width
+      .style("stroke-linecap", "round");   // stroke-linecap type
+       // Add the X Axis
+       svg1.append("g")
+       .attr("class", "x axis")
+       .attr("transform", "translate(3," + height + ")")
+       .call(xAxis);
+ 
+      // Add the Y Axis
+      svg1.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+  
+      
+       // Add the text label for the x axis
+    svg1.append("text")
+        .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.bottom) + ")")
+        .style("text-anchor", "middle")
+        .text("Hours");
+
+
+    // Add the text label for the Y axis
+    svg1.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x",0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Server Load in %");
+ 
+//});
+</script>
+</body>
+</html>

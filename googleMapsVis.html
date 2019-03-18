@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<html>
+  <head>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <style>
+	.box3{
+	 position: absolute;
+	 width: 100%;
+  top: 50%;
+  left: 20%;
+	}
+	.select{
+	
+	 border: 3px solid green;
+	 left: 50%;
+	 position: absolute;
+	}
+	</style>
+  </head>
+  <body>
+  <script> 
+    $(function(){
+      $("#includedContent").load("navbar.html"); 
+    });
+    </script> 
+	<div id="includedContent"></div>
+  <h1 align="center">Analyze customers, products and time of your BUSINESS</h1>
+
+
+
+
+  <div class="box3">    <iframe src="https://www.google.com/maps/d/embed?mid=1UzD1OZl-W7LYNPrXjKddny9BsGo5AYpK" id = "ifr" frameborder="2" scrolling="no" width="70%" height="412" >
+    </iframe>
+    <script type='text/javascript'>
+	var data = ["Top 3 customers", "Top 3 products", "Peak Time and Month"];
+function update(selectValue)
+{
+if(selectValue=="Top 3 customers")
+{
+var myIFrame = document.getElementById(ifr);
+ifr.src = "https://www.google.com/maps/d/embed?mid=1UzD1OZl-W7LYNPrXjKddny9BsGo5AYpK"; 
+	console.log(selectValue);
+}
+
+if(selectValue=="Top 3 products")
+{
+var myIFrame = document.getElementById(ifr);
+ifr.src = "https://www.google.com/maps/d/embed?mid=1QzDmdbpq4t1oMiemOY23MS2dp-hW1Yfr"; 
+	console.log(selectValue);
+}
+
+if(selectValue=="Peak Time and Month")
+{
+var myIFrame = document.getElementById(ifr);
+ifr.src = "https://www.google.com/maps/d/embed?mid=1nrWrxdzVSjyQdMOCOHEHXuPMAET6qrJ3"; 
+	console.log(selectValue);
+}
+};
+var select = d3.select('body')
+  .append('select')
+  	.attr('class','select')
+    .on('change',onchange)
+
+var options = select
+  .selectAll('option')
+  .attr('border', '1px solid #ddd')
+				.attr('padding', '4px 8px')
+				.attr('background', '#eee')
+				.attr('width', '100px')
+				.style("float","right")
+				.on('mouseenter', function() {
+					d3.select(this).transition() // 'this' is a DOM element
+						.attr('background', '#ee3')
+				})
+				.on('mouseleave', function() {
+					d3.select(this).transition()
+						.attr('background', '#eee')
+				})
+				
+	.data(data).enter()
+	
+	.append('option')
+		.text(function (d) { return d; })
+		;
+
+function onchange() {
+	selectValue = d3.select('select').property('value')
+	d3.select('body')
+		.append('p')
+	
+	update(selectValue)
+};
+
+
+	</script>
+  </body>
+</html>

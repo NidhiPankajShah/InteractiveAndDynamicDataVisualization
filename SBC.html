@@ -1,0 +1,343 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <!--script src="http://d3js.org/d3.v3.min.js"></script-->
+  <style>
+    
+    .box{
+    float:left;
+    
+}
+.box1
+{
+float-right;
+margin-left:100px;
+}
+.clear{
+    clear:both;
+}
+.box2{
+    float:right;
+	
+   margin-right:20%;
+	
+	
+}
+.box3 
+{
+ float:right;
+  margin-right:18%;
+	
+   width:200px;
+}
+svg
+{
+
+ float:left;
+		
+   margin-left:100px;
+}
+  </style>
+</head>
+
+<body>
+<script> 
+    $(function(){
+      $("#includedContent").load("navbar.html"); 
+    });
+    </script> 
+	<div id="includedContent"></div>
+  <br>
+  <div class="box1"><iframe id="monthQuantity" src="lineChart.html" frameborder="0" scrolling="no" width="50%" height="60%" align="left"> </iframe> </div>
+
+<div class="box2">    <iframe id="timeQuantity" src="bubblechart.html" frameborder="0" scrolling="no" width="170%" height="100%" >
+    </iframe></div>
+	
+	<div class="clear"></div>
+
+<div class="box3">    <iframe id="customerQuantity" src="pieChart.html" frameborder="0" scrolling="no" width="200%" height="412" >
+    </iframe></div>
+	
+	
+  <button class="btn btn-success" id="byValueascending"> Sort by Value - Ascending</button>
+  <button class="btn btn-success" id="byValue"> Sort by Value - Descending</button>
+  
+ 
+  <script src="lineChart.js"></script>
+  <script>
+
+   var url = "http://localhost:3002/get";
+// load the data
+d3.json(url, function(error, data) {
+    
+    data.forEach(function(d) {
+        d.Country = d.Country;
+        d.Quantity = +d.Quantity;
+    });
+    
+var w = 500;
+var h = 400;
+var margin = {
+    top: 20,
+    bottom: 200,
+    left: 30,
+    right: 20
+};
+var width = w - margin.left - margin.right;
+var height = h - margin.top - margin.bottom;
+    
+var x = d3.scaleBand()
+        .domain(data.map(function(d){
+            return d.Country;
+        }))
+        .range([margin.left, width])
+    		.padding(0.1);
+    
+var y = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d){
+            return d.Quantity;
+        })])
+				.range([height, margin.top])
+
+var yAxis = d3.axisLeft().scale(y)
+        
+
+var svg = d3.select("body").append("svg")
+            .attr("id", "chart")
+            .attr("width", w)
+            .attr("height", h)
+			.style("align","left");
+    				
+						svg.append("g")
+						.attr("class","axis")
+						.attr("transform","translate(" + margin.left + ",0)")
+						.call(yAxis);
+         
+
+    svg.selectAll("rect")
+        .data(data)
+        .enter()
+            .append("rect")
+   					.attr("class","bar")
+       			.on("mouseover",function(){
+      				d3.select(this)
+              	.attr("fill","red")
+    				}) 				
+    				.on("mouseout",function(){
+      				d3.select(this)
+              	.transition("colorfade")
+								.duration(250)
+    						.attr("fill","blue")
+    				})
+				.on("click", function(d){
+				var Country = d.Country;
+				monthQuantity
+				var iframeBubble = document.getElementById("timeQuantity");
+				var iframeLine = document.getElementById("monthQuantity");
+				var iframePie = document.getElementById("customerQuantity");
+				
+				switch(d.Country){
+				case "USA":
+					iframeBubble.src="bubblechartUSA.html";
+					iframeLine.src="lineChartUSA.html";
+					iframePie.src="pieChartUSA.html";
+					
+					break;
+				case "Australia":
+					iframeBubble.src="bubblechartAustralia.html";
+					iframeLine.src="lineChartAustralia.html";
+					iframePie.src="pieChartAustralia.html";
+					break;
+				case "Brazil":
+					iframeBubble.src="bubblechartBrazil.html";
+					iframeLine.src="lineChartBrazil.html";
+					iframePie.src="pieChartBrazil.html";
+					break;
+				case "United Kingdom":
+					iframeBubble.src="bubblechartUnitedKingdom.html";
+					iframeLine.src="lineChartUnitedKingdom.html";
+					iframePie.src="pieChartUnitedKingdom.html";
+					
+					break;
+				case "Germany":
+					iframeBubble.src="bubblechartGermany.html";
+					iframeLine.src="lineChartGermany.html";
+					iframePie.src="pieChartGermany.html";
+					break;
+				}
+				
+				
+				var url = "http://localhost:3002/timesales/United%20Kingdom";
+				
+ lineChart(url);
+				console.log(d.Country);
+				})					
+    
+    				.attr("fill","blue")
+    				    
+            .attr("x", function(d,i){
+               return x(d.Country);
+            })
+    				.attr("width", x.bandwidth())    
+    				.attr("y", height)   				
+    				
+						.transition("bars")
+						.delay(function(d, i) {
+							return i * 50;
+						})
+						.duration(1000)
+    
+     			  .attr("y", function(d,i){
+               return y(d.Quantity);
+            })   				
+            .attr("height", function(d,i){
+      				return height-y(d.Quantity);
+    				})
+            					
+        				
+
+   svg.selectAll("rect") 			
+    				.append("title")
+			   		.text(function(d) {
+			   			return d.Country + ": " + d.Quantity;
+			   		})
+   
+
+
+    svg.selectAll(".val-label")
+        .data(data)
+        .enter()
+            .append("text")
+            .classed("val-label", true)
+
+            .attr("x", function(d,i){
+                return x(d.Country) + x.bandwidth()/2;
+            })
+    				.attr("y", height)   				
+    				
+						.transition("label")
+						.delay(function(d, i) {
+							return i * 50;  // gives it a smoother effect
+						})
+						.duration(1000)
+    
+     			  .attr("y", function(d,i){
+                return y(d.Quantity) - 4;
+            })
+    				.attr("text-anchor","middle")
+    				.text(function(d){return d.Quantity});
+  
+  	svg.selectAll(".bar-label")
+            .data(data)
+        		.enter()
+            .append("text")
+            .classed("bar-label", true)
+    
+						.attr("transform",function(d,i){
+      				return "translate(" + (x(d.Country) + x.bandwidth()/2 - 8 ) + "," + (height+15) + ")" 
+              	+ " rotate(45)" })
+    				 
+      			.attr("text-anchor","left")
+    				.text(function(d){return d.Country})
+    
+    d3.select("#byValue").on("click", function() {
+  data.sort(function(a, b) {
+    return d3.descending(a.Quantity, b.Quantity)
+  })
+  x.domain(data.map(function(d) {
+    return d.Country;
+  }));
+  svg.selectAll(".bar")
+    .transition()
+    .duration(500)
+    .attr("x", function(d, i) {
+      return x(d.Country);
+    })
+
+  svg.selectAll(".val-label")
+    .transition()
+    .duration(500)
+    .attr("x", function(d, i) {
+      return x(d.Country) + x.bandwidth() / 2;
+    })
+
+  svg.selectAll(".bar-label")
+    .transition()
+    .duration(500)
+    .attr("transform", function(d, i) {
+      return "translate(" + (x(d.Country) + x.bandwidth() / 2 - 8) + "," + (height + 15) + ")" + " rotate(45)"
+    })
+
+})
+
+d3.select("#byQuantity").on("click", function() {
+  data.sort(function(a, b) {
+    return d3.descending(a.Quantity, b.Quantity)
+  })
+  x.domain(data.map(function(d) {
+    return d.Country;
+  }));
+  svg.selectAll(".bar")
+    .transition()
+    .duration(500)
+    .attr("x", function(d, i) {
+      return x(d.Country);
+    })
+
+  svg.selectAll(".val-label")
+    .transition()
+    .duration(500)
+    .attr("x", function(d, i) {
+      return x(d.Country) + x.bandwidth() / 2;
+    })
+
+  svg.selectAll(".bar-label")
+    .transition()
+    .duration(500)
+    .attr("transform", function(d, i) {
+      return "translate(" + (x(d.Country) + x.bandwidth() / 2 - 8) + "," + (height + 15) + ")" + " rotate(45)"
+    })
+})
+
+d3.select("#byValueascending").on("click", function() {
+  data.sort(function(a, b) {
+    return d3.ascending(a.Quantity, b.Quantity)
+  })
+  x.domain(data.map(function(d) {
+    return d.Country;
+  }));
+  svg.selectAll(".bar")
+    .transition()
+    .duration(500)
+    .attr("x", function(d, i) {
+      return x(d.Country);
+    })
+
+  svg.selectAll(".val-label")
+    .transition()
+    .duration(500)
+    .attr("x", function(d, i) {
+      return x(d.Country) + x.bandwidth() / 2;
+    })
+
+  svg.selectAll(".bar-label")
+    .transition()
+    .duration(500)
+    .attr("transform", function(d, i) {
+      return "translate(" + (x(d.Country) + x.bandwidth() / 2 - 8) + "," + (height + 15) + ")" + " rotate(45)"
+    })
+})
+
+});
+
+
+
+  </script>
+</body>
+</html>

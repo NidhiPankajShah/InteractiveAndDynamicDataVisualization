@@ -1,0 +1,294 @@
+<html>
+<head>
+    <title>Dynamic bar chart</title>
+	
+	<style>
+	#cont {
+    position: relative;
+    background: white;
+    margin-top: 4px;
+}
+
+rect {
+    stroke: white;
+    stroke-width: 1px;
+}
+rect.w-price:hover {
+    fill: #026dc5;
+    stroke: #026dc5;
+}
+
+rect.no-price:hover {
+    fill: grey;
+    stroke: #ADABAB;
+}
+.grid line {
+    stroke: #ADABAB;
+}
+.grid .domain {
+    display: none
+}
+.tooltip {
+    box-sizing: border-box;
+    position: absolute;
+    height: auto;
+    padding: 10px;
+    background-color: white;
+    box-shadow: 0px 1px 2px rgba(black, 0.4);
+    pointer-events: none;
+}
+.tooltip.hidden {
+    display: none;
+}
+.tooltip p {
+    margin: 0;
+    font-family: sans-serif;
+    font-size: 16px;
+    line-height: 20px;
+}
+.axis path,
+.axis line {
+    stroke: grey;
+    shape-rendering: crispEdges;
+    display: none;
+}
+.axis text {
+    font-family: Optima, Futura, sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    fill: grey;
+}
+	</style>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+    <div id="cont"></div>
+    <script>
+        (function() {
+            var margin = {
+                    top: 20,
+                    right: 20,
+                    bottom: 70,
+                    left: 40
+                },
+                width,
+                height = 340 - margin.top - margin.bottom,
+                cont = document.getElementById('cont'),
+                unknownH = 250,
+                tooltip = document.createElement('div'),
+                locale = 'hu-HU',
+                dummyData = [
+                    {
+                        id: 1,
+                        productName: 'product 1',
+                        price: 90
+                    },
+                    {
+                        id: 2,
+                        productName: 'product 2',
+                        price: 120
+                    },
+                    {
+                        id: 3,
+                        productName: 'product 3',
+                        price: null
+                    },
+                    {
+                        id: 4,
+                        productName: 'product 4',
+                        price: null
+                    },
+                    {
+                        id: 5,
+                        productName: 'product 5',
+                        price: null
+                    },
+                    {
+                        id: 6,
+                        productName: 'product 6',
+                        price: null
+                    },
+                    {
+                        id: 7,
+                        productName: 'product 7',
+                        price: null
+                    },
+                    {
+                        id: 8,
+                        productName: 'product 8',
+                        price: 50
+                    }
+                ],
+                svg, xScale, yScale, xAxis, yAxis, data, currentPrice, interval;
+
+            tooltip.classList.add('tooltip', 'hidden');
+            tooltip.innerHTML = '<span id="value">100</span>';
+
+            //Load locale
+            d3.json('https://unpkg.com/d3-format@1.2.0/locale/' + locale + '.json', function(error, locale) {
+                if (error) {
+                    throw error;
+                }
+
+                d3.formatDefaultLocale(locale);
+            });
+
+            interval = setInterval(function () {
+                var updated = false;
+                //pick on null from dummyData and set a value then update the chart
+                if (dummyData.some(d => d.price === null)) {
+                    console.log('update bars');
+                    dummyData.forEach((d) => {
+                        if (d.price === null && !updated) {
+                            d.price = Math.random() * 100;
+                            updated = true;
+                        }
+                        return d;
+                    });
+                    updateBars(dummyData);
+                } else {
+                    // if all were set then finish the chart and reset the timer
+                    console.log('finished');
+                    clearInterval(interval);
+                }
+            }, 1000);
+
+            width = cont.offsetWidth - margin.left - margin.right;
+
+            drawD3(cont);
+
+            function updateBars(data) {
+                yScale.domain([0, d3.max(data.map(function(d) {
+                    return Math.round(d.price) || 0;
+                }))]);
+                yAxis.scale(yScale);
+
+                svg.select('.yaxis')
+                    .call(yAxis);
+
+                svg.selectAll('rect')
+                    .data(data)
+                    .transition()
+                    .ease(d3.easeCircleIn)
+                    .attr('x', function(d, i) {
+                        return xScale(d.productName);
+                    })
+                    .attr('y', function(d) {
+                        return yScale(d.price || unknownH);
+                    })
+                    .attr('height', function(d) {
+                        return height - yScale(d.price || unknownH);
+                    })
+                    .attr('fill', function(d) {
+                        return d.price ? '#026dc5' : '#e8e8e8';
+                    })
+                    .attr('class', function(d) {
+                        return d.price ? 'w-price' : 'no-price';
+                    });
+            }
+
+            function drawD3(container) {
+                //Define scales
+                xScale = d3.scaleBand()
+                    .domain(dummyData.map(function(d) {
+                        return d.productName;
+                    }))
+                    .rangeRound([0, width]).paddingInner(0.05);
+
+                yScale = d3.scaleLinear()
+                    .domain([0, unknownH])
+                    .range([height, 0]);
+
+                //Define Axis
+                xAxis = d3.axisBottom().tickFormat(function(d, i) {
+                    return d;
+                }).scale(xScale);
+                yAxis = d3.axisLeft().ticks(4).tickFormat(d3.format('($')).scale(yScale);
+
+                //Create SVG element
+                svg = d3.select(container).append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append('g')
+                    .attr('transform',
+                        'translate(' + margin.left + ',' + margin.top + ')');
+
+                //Create background grid
+                svg.append('g')
+                    .attr('class', 'grid')
+                    .call(d3.axisLeft(yScale).ticks(4).tickSize(-width).tickFormat(''));
+
+                //Add tooltip
+                container.appendChild(tooltip);
+                var localTooltip = d3.select('.tooltip');
+
+
+                //Create bars
+                svg.selectAll('rect')
+                    .data(dummyData)
+                    .enter()
+                    .append('rect')
+                    .attr('x', function(d, i) {
+                        return xScale(d.productName);
+                    })
+                    .attr('width', xScale.bandwidth())
+                    .attr('y', function(d) {
+                        return yScale(d.price || unknownH);
+                    })
+                    .attr('height', function(d) {
+                        return height - yScale(d.price || unknownH);
+                    })
+                    .attr('fill', function(d) {
+                        return d.price ? '#026dc5' : '#e8e8e8';
+                    })
+                    .attr('class', function(d) {
+                        return d.price ? 'w-price' : 'no-price';
+                    })
+                    //Attach event listeners
+                    .on('mouseover', function(d) {
+                        //Get this bar's x/y values, then augment for the tooltip
+                        var xPosition = parseFloat(d3.select(this).attr('x')) + margin.left; // padding left
+                        var yPosition = parseFloat(d3.select(this).attr('y')) + margin.top; // padding top
+                        //TODO: handle tooltip position dynamically
+
+                        //Update the tooltip position and value
+                        localTooltip
+                            .style('left', xPosition + 'px')
+                            .style('top', yPosition + 'px')
+                            .style('width', xScale.bandwidth() + 'px')
+                            .select('#value')
+                            .text(d.price ? d3.format('($')(d.price) : 'Not available');
+
+                        //Show the tooltip
+                        localTooltip.classed('hidden', false);
+                    })
+                    .on('mouseout', function() {
+                        //Hide the tooltip
+                        localTooltip.classed('hidden', true);
+                    })
+                    .on('click', function(d) {
+                        console.log('clicked');
+                    });
+
+                //Create axis
+                svg.append('g')
+                    .attr('class', 'axis xaxis')
+                    .attr('transform', 'translate(0,' + height + ')')
+                    .call(xAxis)
+                    .selectAll('text')
+                    .style('text-anchor', 'end')
+                    .attr('dx', '-.8em')
+                    .attr('dy', '-.55em')
+                    .attr('transform', 'rotate(-45)');
+
+                svg.append('g')
+                    .attr('class', 'axis yaxis')
+                    .call(yAxis);
+
+                console.log('first draw completed');
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+.green { 
+    background: green;
+}
+
+.red {
+    background: red;
+}
+#myTable {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #ddd;
+  font-size: 18px;
+}
+
+#myTable th, #myTable td {
+  text-align: left;
+  padding: 12px;
+}
+
+#myTable tr {
+  border-bottom: 1px solid #ddd;
+}
+
+#myTable tr.header, #myTable tr:hover {
+  background-color: #f1f1f1;
+}
+</style>
+<script>
+function back(){
+window.location.replace("http://localhost:8080/pieChart.html");
+}
+
+</script>
+<script>
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
+
+</head>
+<body>
+  <!--input class="form-control" id="myInput" type="text" placeholder="Search..">
+
+<table  id="myTable" class ="results">
+ <tr class="header">
+    <th style="width:60%;">Name</th>
+    <th style="width:40%;">Country</th>
+  </tr>
+    <tr>
+        <td>Confirmed</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>Unconfirmed</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>Confirmed</td>
+        <td>4</td>
+    </tr>
+    <tr>
+        <td>Unconfirmed</td>
+        <td>3</td>
+    </tr>
+</table-->
+<button onclick="back()">Back</button>
+<input class="form-control" id="myInput" type="text" placeholder="Search..">
+
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/><link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css" rel="stylesheet"/><table id="myTable" data-toggle="table"  data-sort-name="stargazers_count" data-sort-order="desc"> <thead> <tr> <th data-field="name" data-sortable="true"> Name </th> <th data-field="stargazers_count" data-sortable="true"> Username</th> <th data-field="forks_count" data-sortable="true"> Transaction Date </th> <th data-field="description" data-sortable="true"> Order Money </th> </tr></thead> </tr>
+    <tr>
+        <td>Harvey Specter</td>
+        <td>hs-suits</td>
+		 <td>12/03/2018</td>
+        <td>20000</td>
+    </tr>
+    <tr>
+        <td>Harvey Specter</td>
+        <td>hs-suits</td>
+		 <td>11/07/2018</td>
+        <td>2765</td>
+    </tr><tr>
+        <td>Harvey Specter</td>
+        <td>hs-suits</td>
+		 <td>10/03/2018</td>
+        <td>1890</td>
+    </tr><tr>
+        <td>Harvey Specter</td>
+        <td>hs-suits</td>
+		 <td>08/03/2018</td>
+        <td>45098</td>
+    </tr><tr>
+        <td>Harvey Specter</td>
+        <td>hs-suits</td>
+		 <td>05/03/2018</td>
+        <td>86001</td>
+    </tr></table><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.js"></script>
+
+</body>
+</html>
